@@ -1,0 +1,169 @@
+﻿function showHubInfo(tNoHub) {
+    //alert(tNoHub)
+    try {
+		var _signHandler = SignHandler();
+		var _notificationHub = _signHandler.CreateHub('notificationhub', "https://push.1111.com.tw/SignalRServer45", 'ver=20150326&tNo=' + tNoHub, {
+			isAutoStop: false,
+			delegate: {
+				onReceived: function (hub, M, args) {
+					//console.log(JSON.stringify({ hub: hub.name, event: M, args: args })); 
+					if(M == "UserOnline"){
+						eval(M+"('"+args+"')");
+					}
+					else{
+						eval(M+"("+args+")");
+					}
+				}
+			}
+		});
+		
+		var showNotify = function (msg, mode) {
+			switch (mode) {
+                case 1:                   
+                    if (msg == '0') { $('#notifyCount').hide(); $('.alert').removeClass('alertact'); } else {
+                        //if ($('#notifyCount').html() != msg) { blind("notifycount", "showCountWord", "showCountWord1", 500); }
+                        $('#notifycount').html(msg);
+                        $('#notifycount').show();                                                
+                        $('.alert').addClass('alertact');                                        
+                    }
+                    //$.post('/includesU/toplink/topLinkCookies.asp', { 'notifycount': msg });
+                    $.ajax({
+                        type: "POST",
+                        url: "/includesU/toplink/topLinkCookies.asp",
+                        data: { 'notifycount': msg },
+                        dataType: "text"
+                    })
+                    break;
+                case 2:
+                    if (msg == '0') { $('#previewCount').hide(); $('.browse').removeClass('browseact'); } else {
+                        //if ($('#previewCount').html() != msg) { blind("previewcount", "showCountWord", "showCountWord1", 500); }
+                        $('#previewcount').html(msg);
+                        $('#previewcount').show(); $('.browse').addClass('browseact');
+                    }
+                    //$.post('/includesU/toplink/topLinkCookies.asp', { 'previewcount': msg });
+                    $.ajax({
+                        type: "POST",
+                        url: "/includesU/toplink/topLinkCookies.asp",
+                        data: { 'previewcount': msg },
+                        dataType: "text"
+                    })
+                    break;
+                default:
+                    $('#notifyCount').hide();$('.alert').removeClass('alertact');
+                    $('#previewCount').hide(); $('.browse').removeClass('browseact');
+                    break;
+            }
+		};
+		
+		var UserOnline = function (dtNextUpdate) {
+               SaveUpdateTime(dtNextUpdate);
+               var UpdateTime = (new Date()).toLocaleString('zh-TW', { hour12: false });
+               _notificationHub.invokeNoUUid("OnlineUpdate", tNoHub, UpdateTime);
+           };
+
+		_notificationHub.invokeNoUUid("YouGetMail", 0);
+		var UpdateTime = GetUpdateTime();
+		_notificationHub.invokeNoUUid("OnlineUpdate", tNoHub, UpdateTime);
+			
+		/*
+        var _notificationHub = $.connection.notificationHub;
+        _notificationHub.client.showNotify = function (msg, mode) {            
+            switch (mode) {
+                case 1:                   
+                    if (msg == '0') { $('#notifyCount').hide(); $('.alert').removeClass('alertact'); } else {
+                        //if ($('#notifyCount').html() != msg) { blind("notifycount", "showCountWord", "showCountWord1", 500); }
+                        $('#notifycount').html(msg);
+                        $('#notifycount').show();                                                
+                        $('.alert').addClass('alertact');                                        
+                    }
+                    //$.post('/includesU/toplink/topLinkCookies.asp', { 'notifycount': msg });
+                    $.ajax({
+                        type: "POST",
+                        url: "/includesU/toplink/topLinkCookies.asp",
+                        data: { 'notifycount': msg },
+                        dataType: "text"
+                    })
+                    break;
+                case 2:
+                    if (msg == '0') { $('#previewCount').hide(); $('.browse').removeClass('browseact'); } else {
+                        //if ($('#previewCount').html() != msg) { blind("previewcount", "showCountWord", "showCountWord1", 500); }
+                        $('#previewcount').html(msg);
+                        $('#previewcount').show(); $('.browse').addClass('browseact');
+                    }
+                    //$.post('/includesU/toplink/topLinkCookies.asp', { 'previewcount': msg });
+                    $.ajax({
+                        type: "POST",
+                        url: "/includesU/toplink/topLinkCookies.asp",
+                        data: { 'previewcount': msg },
+                        dataType: "text"
+                    })
+                    break;
+                default:
+                    $('#notifyCount').hide();$('.alert').removeClass('alertact');
+                    $('#previewCount').hide(); $('.browse').removeClass('browseact');
+                    break;
+            }
+        };
+        _notificationHub.client.ConnectStop = function () {
+            _notificationHub.connection.stop();
+        };
+
+        _notificationHub.client.UserOnline = function (dtNextUpdate) {
+               SaveUpdateTime(dtNextUpdate);
+               var UpdateTime = (new Date()).toLocaleString('zh-TW', { hour12: false });
+               _notificationHub.server.OnlineUpdate(tNoHub, UpdateTime);
+           };
+
+        _notificationHub.connection.qs = { 'tNo': tNoHub };
+        _notificationHub.connection.url = '//push.1111.com.tw/SignalRServer45/signalr';
+        _notificationHub.connection.start().done(function () {
+            _notificationHub.server.YouGetMail(0);
+
+            var UpdateTime = GetUpdateTime();
+            _notificationHub.server.OnlineUpdate(tNoHub, UpdateTime);
+
+        }).fail(function () {
+            console.log("Could not connect!");
+        });
+
+*/
+
+
+
+    } catch (ex) { }
+}
+
+
+function SaveUpdateTime(SaveTime) {
+   localStorage.setItem('OnLineTime', SaveTime);
+}
+function GetUpdateTime() {
+    try {
+       var UpdateTime = localStorage.getItem('OnLineTime')+'';
+       var NowDate = new Date();
+       var UpdFlag=false;
+       if (UpdateTime.length == 0 || UpdateTime == null || UpdateTime == 'null' || !(isNaN(UpdateTime)) || (UpdateTime+'').indexOf(',')>=0) {
+           UpdateTime = NowDate.toLocaleString('zh-TW', { hour12: false });UpdFlag=true;
+       } else {
+           var dtUpdate = new Date(UpdateTime);
+           if (dtUpdate < NowDate) {
+               UpdateTime = NowDate.toLocaleString('zh-TW', { hour12: false });UpdFlag=true;
+           }
+       }
+       if (UpdFlag){
+           NowDate.setSeconds(NowDate.getSeconds() + 3600);
+           var SaveTime = NowDate.toLocaleString('zh-TW', { hour12: false });
+           SaveUpdateTime(SaveTime);
+           console.log('下次更新時間(儲存)：' + SaveTime); 
+       }
+       console.log('這次更新時間：' + UpdateTime);
+       return UpdateTime
+    } catch (ex) { }
+}
+
+function blind(id, css1, css2, ms) {
+    var o = document.getElementById(id);
+    o.className = (o.className == css1) ? css2 : css1;
+    setTimeout('blind("' + id + '","' + css1 + '","' + css2 + '",' + ms + ')', ms);
+}
+

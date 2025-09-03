@@ -1,0 +1,4 @@
+function setHref(lNo) {
+  $.post('/includes_xml/linkRedirMain.asp', { 'lNo': lNo }
+	);
+}

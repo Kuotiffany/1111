@@ -1,0 +1,238 @@
+function menuToplink(t) {
+    $.getJSON("//www.1111.com.tw/includesU/toplink/topLink_menuJson.asp?jsoncallback=?", {
+        format: "json",
+        mNo: t
+    }).done(function(t) {
+        var e, n, o = t.contents.length,
+            a = "",
+            s = "",
+            c = "",
+            l = "";
+        for (i = 0; i < o; i++) e = t.contents[i].kind, n = t.contents[i].msgNo, c = "幸福企業" == (a = t.contents[i].msg) || "行銷大平台" == a || "最感人工作" == a ? 'class="organTextLink"' : "", 2 == e && "" != c && (l = ' otherHiddenLink"'), 2 == e && (c = 'class="otherTextLink' + l + '"'), s = s + ' <ul class="navLeft ' + ("人力銀行" == a ? (a = '<span class="toplinkLogo">1111</span>人力銀行', "toplinkLogoShow") : "menunavLeft") + '"><li><a href="' + t.contents[i].link + '" id="toplink_' + n + '" ad_id="' + n + '" onclick="setHrefTopLink(\'' + n + '\')" target="_blank" ' + c + ">" + a + "</a></li></ul>";
+        $(".navLeft").remove(), $(".toplinkzone").append(s), window.adImpressionPost && adImpressionPost("toplinkzone")
+    })
+}
+
+function setHrefTopLink(t) {
+    $.ajax({
+        type: "POST",
+        url: "/includes_xml/linkRedirMain.asp",
+        data: {
+            lNo: t
+        },
+        dataType: "text",
+        success: function(t) {}
+    })
+}
+
+function toplinkmenu() {
+    var t = $(".alert"),
+        n = $(".alertmenu"),
+        o = $(".browse"),
+        s = $(".browsemenu"),
+        e = $(".match"),
+        a = $(".matchmenu"),
+        c = $(".name"),
+        l = $(".selfmenu");
+    $("html,body").click(function(t) {
+        s.add(a).add(n).add(l).hide()
+    });
+    var r = location.hostname;
+    "192.168.1.234" != r && "wwwtest.1111.com.tw" != r && (r = "www.1111.com.tw"), t.on("click", function(t) {
+        "block" == n.css("display") ? n.hide() : -1 != $(this).attr("class").indexOf("login") ? $.getJSON("//" + r + "/includesU/toplink/topLink_contentJson.asp?jsoncallback=?", {
+            format: "json",
+            kind: "alert",
+            page: "1"
+        }).done(function(t) {
+            if (t.login)
+                if (0 == t.totalData) n.html("<dt>通知我的企業</dt><div class='nodata'><i class='iconExclamationCircle'></i><span>目前沒有新資料</span></div><div class='scroll' id='scrollAlert' ></div><dd class='viewall'><a href='//www.1111.com.tw/CorpNotification/Index'>看全部資訊</a></dd>"), n.slideToggle(10);
+                else {
+                    var a = "",
+                        e = t.contents.length;
+                    for (i = 0; i < e; i++) a = a + "<dd class='" + t.contents[i].status + "'><a href='//" + r + "/CorpNotification/Index?mno=" + t.contents[i].mNo + "' target='_blank'><span class='toplinkview'>" + t.contents[i].organ + "/" + t.contents[i].position0 + "</span><p>" + t.contents[i].kind + "<span class='gray13'>(" + t.contents[i].datetime + ")</span></p></a></dd>";
+                    1 < t.nextPage && (a = a + "<div id='recordbarMore_" + t.nextPage + "' style='display:none;' ></div>"), n.html("<dt>通知我的企業</dt><div class='scroll' id='scrollAlert' >" + a + "</div><dd class='viewall'><a href='//www.1111.com.tw/CorpNotification/Index'>看全部資訊</a></dd>"), n.slideToggle(10), $(".scroll").scroll(function() {
+                        var n, o = $(this);
+                        viewH = o.height(), contentH = o.get(0).scrollHeight, scrollTop = o.scrollTop(), contentH - viewH - scrollTop <= 30 && (0 < $("[id^=recordbarMore]").length ? (n = $("[id^=recordbarMore]").attr("id").split("_"), $("#recordbarMore_" + n[1]).remove(), o.css("padding-bottom", "20px").addClass("loadingIcon"), a = "", $.getJSON("//" + r + "/includesU/toplink/topLink_contentJson.asp?jsoncallback=?", {
+                            format: "json",
+                            kind: "alert",
+                            page: n[1]
+                        }).done(function(t) {
+                            if (t.login) {
+                                var e = t.contents.length;
+                                for (i = 0; i < e; i++) a = a + "<dd class='" + t.contents[i].status + "'><a href='//" + r + "/CorpNotification/Index?mno=" + t.contents[i].mNo + "' target='_blank'><span class='toplinkview'>" + t.contents[i].organ + "/" + t.contents[i].position0 + "</span><p>" + t.contents[i].kind + "<span class='gray13'>(" + t.contents[i].datetime + ")</span></p></a></dd>";
+                                1 < t.nextPage && (alert = "IN", a = a + "<div id='recordbarMore_" + t.nextPage + "' style='display:none;' ></div>"), setTimeout(function() {
+                                    $("#scrollAlert").append(a), $("#recordbarMore_" + n[1]).remove(), o.addClass("loadingIcon")
+                                }, 500)
+                            }
+                        })) : o.css("padding-bottom", "0").removeClass("loadingIcon"))
+                    })
+                }
+            else n.html("<dt>通知我的企業</dt><div class='nodata'><i class='iconEnvelope'></i></div><dd class='viewall'><a href='//www.1111.com.tw/talents/memberlogin.asp?ref=" + encodeURIComponent("//www.1111.com.tw/talents/membercenter/corp-notification.asp") + "' target='_top'>立即登入查看</a></dd>"), n.slideToggle(10)
+        }) : ($(this).removeClass("alertin"), n.slideToggle(10)), s.add(a).add(l).hide(), t.stopPropagation()
+    }), o.on("click", function(t) {
+        "block" == s.css("display") ? s.hide() : -1 != $(this).attr("class").indexOf("login") ? $.getJSON("//" + r + "/includesU/toplink/topLink_contentJson.asp?jsoncallback=?", {
+            format: "json",
+            kind: "browse",
+            page: "1"
+        }).done(function(t) {
+            if (t.login)
+                if (0 == t.totalData) s.html("<dt>瀏覽過我的企業</dt><div class='nodata'><i class='iconExclamationCircle'></i><span>目前沒有新資料</span></div><div class='scroll' id='scrollBrowse'></div><dd class='viewall'><a href='//www.1111.com.tw/CompanyHistory/Index'>看全部資訊</a></dd>"), s.slideToggle(10);
+                else {
+                    var a = "",
+                        e = t.contents.length;
+                    for (i = 0; i < e; i++) a = a + "<dd><a href='//" + r + "/corp/" + t.contents[i].organNo + "/'><span class='toplinkview'>" + t.contents[i].organ + "</span><p>" + t.contents[i].CityTrade + "<span class='gray13'>(" + t.contents[i].datetime + ")</span></p></a></dd>";
+                    1 < t.nextPage && (a = a + "<div id='recordbarMore_" + t.nextPage + "' style='display:none;' ></div>"), s.html("<dt>瀏覽過我的企業</dt><div class='scroll' id='scrollBrowse'>" + a + "</div><dd class='viewall'><a href='//www.1111.com.tw/CompanyHistory/Index'>看全部資訊</a></dd>"), s.slideToggle(10), $("#previewcount").hide(), o.removeClass("browseact"), $(".scroll").scroll(function() {
+                        var n, o = $(this);
+                        viewH = o.height(), contentH = o.get(0).scrollHeight, scrollTop = o.scrollTop(), contentH - viewH - scrollTop <= 30 && (0 < $("[id^=recordbarMore]").length ? (n = $("[id^=recordbarMore]").attr("id").split("_"), o.css("padding-bottom", "20px").addClass("loadingIcon"), a = "", $.getJSON("//" + r + "/includesU/toplink/topLink_contentJson.asp?jsoncallback=?", {
+                            format: "json",
+                            kind: "browse",
+                            page: n[1]
+                        }).done(function(t) {
+                            if (t.login) {
+                                var e = t.contents.length;
+                                for (i = 0; i < e; i++) a = a + "<dd><a href='//" + r + "/corp/" + t.contents[i].organNo + "/'><span class='toplinkview'>" + t.contents[i].organ + "</span><p>" + t.contents[i].CityTrade + "<span class='gray13'>(" + t.contents[i].datetime + ")</span></p></a></dd>";
+                                1 < t.nextPage && (alert = "IN", a = a + "<div id='recordbarMore_" + t.nextPage + "' style='display:none;' ></div>"), setTimeout(function() {
+                                    $("#scrollBrowse").append(a), $("#recordbarMore_" + n[1]).remove(), o.addClass("loadingIcon")
+                                }, 500)
+                            }
+                        })) : o.css("padding-bottom", "0").removeClass("loadingIcon"))
+                    })
+                }
+            else s.html("<dt>瀏覽過我的企業</dt><div class='nodata'><i class='iconEnvelope'></i></div><dd class='viewall'><a href='//www.1111.com.tw/talents/memberlogin.asp?ref=" + encodeURIComponent("//www.1111.com.tw/talents/membercenter/corp-viewed.asp") + "' target='_top'>立即登入查看</a></dd>"), s.slideToggle(10)
+        }) : ($(this).removeClass("browsein"), s.slideToggle(10)), a.add(n).add(l).hide(), t.stopPropagation()
+    }), s.on("click", function(t) {
+        t.stopPropagation(), console.log(".browse click")
+    }), e.on("click", function(t) {
+        "block" == a.css("display") ? a.hide() : -1 != $(this).attr("class").indexOf("login") ? $.getJSON("//" + r + "/includesU/toplink/topLink_contentJson.asp?jsoncallback=?", {
+            format: "json",
+            kind: "match"
+        }).done(function(t) {
+            if (t.login)
+                if (0 == t.totalData) a.html("<dt>我的配對工作<span class='matchBarTime'></span></dt><div class='nodata'><i class='iconExclamationCircle'></i><span>目前沒有新資料</span></div><div class='scroll'></div><dd class='viewall'></dd><dd class='viewall'><a href='//www.1111.com.tw/MatchSet/Index'>看全部資訊</a></dd>"), a.slideToggle(10);
+                else {
+                    var e = "",
+                        n = t.contents.length;
+                    for (i = 0; i < n; i++) e = "1" == t.contents[i].ckText ? e + "<dd class='ipdd" + t.contents[i].setid + "'><div class='ipdd-block'><a href='//" + r + "/MatchSet/Edit/" + t.contents[i].setid + "'><span class='toplinkview'>" + t.contents[i].name + "</span><p>履歷未完成</p></a></dd>" : e + "<dd class='ipdd" + t.contents[i].setid + "'><a href='//" + r + "/MatchSet/Jobs/" + t.contents[i].setid + "'><span class='toplinkview'>" + t.contents[i].name + "</span><p>最新配對<span class='iptm iptm" + t.contents[i].setid + "' index='" + t.contents[i].setid + "'></span>筆工作機會</p></a><a class='ipdd-subscribe' href='//" + r + "/MatchSet/Index' >我要訂閱</a></div></dd>";
+                    a.html("<dt>我的配對工作<span class='matchBarTime'></span></dt><div class='scroll'></div><dd class='viewall'>" + e + "</dd><dd class='viewall'><a href='//www.1111.com.tw/MatchSet/Index'>看全部資訊</a></dd>"), a.slideToggle(10), matchStorageInside()
+                }
+            else a.html("<dt>我的配對工作</dt><div class='nodata'><i class='iconEnvelope'></i></div><dd class='viewall'><a href='//www.1111.com.tw/Login/Index?ReturnUrl=" + encodeURIComponent("//www.1111.com.tw/MatchSet/Index") + "' target='_top'>立即登入查看</a></dd>"), a.slideToggle(10)
+        }) : ($(this).removeClass("matchin"), a.slideToggle(10)), n.add(s).add(l).hide(), t.stopPropagation()
+    }), a.on("click", function(t) {
+        t.stopPropagation(), console.log(".match click")
+    }), c.on("click", function(t) {
+        l.slideToggle(10), s.add(a).hide(), n.hide(), t.stopPropagation()
+    }), $(".tools").hover(function() {
+        $(".alert").find(".txt").addClass("service_box").text("企業通知"), $(".match").find(".txt").addClass("service_box").text("我的配對"), $(".browse").find(".txt").addClass("service_box").text("企業瀏覽")
+    }, function() {
+        $(".alert").find(".txt").removeClass("service_box").text(""), $(".match").find(".txt").removeClass("service_box").text(""), $(".browse").find(".txt").removeClass("service_box").text("")
+    }), $(".service").hover(function() {
+        $(this).find("span").addClass("service_box").text("線上客服")
+    }, function() {
+        $(this).find("span").removeClass("service_box").text("")
+    });
+    var d = location.href,
+        m = "";
+    $(".navigationIn").find("a").each(function() {
+        var t = (t = $(this).attr("href") + "").toLowerCase();
+        "會員登入" == $(this).text() ? ($paramr = "ref", 0 <= t.indexOf("/login/index") && ($paramr = "ReturnUrl"), -1 != d.indexOf("ReturnUrl=") && -1 != d.indexOf("/login/index") || -1 != d.indexOf("ref=") && (-1 != d.indexOf("/talents/memberlogin.asp") || -1 != d.indexOf("/login/memberlogins.asp")) ? $(this).attr("href", d) : (-1 == d.indexOf(".1111.com.tw") && (m = "&IsThirdParty=true"), $(this).attr("href", t + "?" + $paramr + "=" + encodeURIComponent(d) + m))) : "加入會員" == $(this).text() ? -1 != d.indexOf("ReturnUrl=") && -1 != d.indexOf("/registered/index") || -1 != d.indexOf("ref=") && -1 != d.indexOf("/talents/membercenter/resumeNew_1.asp") || -1 != d.indexOf("/resume-new-join.asp") ? $(this).attr("href", d) : $(this).attr("href", t + "&ReturnUrl=" + encodeURIComponent(d)) : "登出" == $(this).text() && (-1 == d.indexOf("192.168.1.234") ? LogoutXmember(d) ? $(this).attr("href", t + "/Account/Logout?ReturnUrl=" + encodeURIComponent(d)) : $(this).attr("href", t + "/Account/Logout?ReturnUrl=/") : $(this).attr("href", t + "/talents/logout.asp?ref=" + encodeURIComponent(d)))
+    })
+}
+
+function LogoutXmember(t) {
+    return -1 == t.toLowerCase().indexOf("/membercenter/,/resume/,/corpnotification/,/interview/,/companyhistory/,/applyrecord/,/matchset/,/collectcorp/,/collectjob/,/member/,/industryhide/,/careerguidance/,/jobelves/")
+}
+
+function TopLinkIsMobile() {
+    return !!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
+function notifyNum(t) {
+    "block" == $("#notifycount").css("display") && "1" == t && (parseInt($("#notifycount").html()) - 1 == 0 ? ($("#notifycount").hide(), $(".alert").removeClass("alertact")) : $("#notifycount").html(parseInt($("#notifycount").html()) - 1))
+}
+
+function getCookie(t) {
+    for (var e = t + "=", n = document.cookie.split(";"), o = 0; o < n.length; o++) {
+        for (var a = n[o];
+            " " == a.charAt(0);) a = a.substring(1);
+        if (0 == a.indexOf(e)) return a.substring(e.length, a.length)
+    }
+    return ""
+}
+
+function QueryString(t) {
+    var e = window.location.search.substring(1).toLowerCase().split("&");
+    for (i = 0; i < e.length; i++) {
+        var n = e[i].split("=");
+        if (n[0] == t) return n[1]
+    }
+    return ""
+}
+
+function matchJsonChange(t, e) {
+    var n = JSON.parse(t),
+        o = JSON.parse(e); - 1 != t.indexOf("setid") && -1 != e.indexOf("setid") && n.length == o.length && $.each(n, function(t, e) {
+        e.setid == o[t].setid && e.num > o[t].num ? n[t].setCss = "1" : n[t].setCss = o[t].setCss
+    }), localStorage.setItem("matchListCount", JSON.stringify(n))
+}
+
+function matchStorage(n) {
+    var t, a, o, s, c, l, e, r;
+    "" != n.length && ("192.168.1.234" != (t = location.hostname) && "wwwtest.1111.com.tw" != t && (t = "www.1111.com.tw"), a = localStorage.getItem("matchListCount"), o = localStorage.getItem("matchDateBegin"), s = !1, c = "", l = new Date, null != a && null != o && (a.indexOf("checkID") < 0 && (localStorage.removeItem("matchDateBegin"), localStorage.removeItem("matchListCount")), e = JSON.parse(a), $.each(e, function(t, e) {
+        "checkID" == e.setid && (e.num == n ? l.getTime() - o < 18e5 && (s = !0) : (localStorage.removeItem("matchDateBegin"), localStorage.removeItem("matchListCount")))
+    })), 0 <= location.pathname.indexOf("/talents/membercenter/match-joblist.asp") && (c = QueryString("matchguid").replace("{", "").replace("}", "").toUpperCase()), console.log(c), s ? (r = JSON.parse(a), $.each(r, function(t, e) {
+        "topNum" == e.setid && "1" == e.setCss && ($("#matchcount").html(" <i class='iconExclamation' aria-hidden='true'>"), $("#matchcount").show(), $(".match").addClass("matchact")), e.setid == c && "1" == r[t].setCss && (r[t].setCss = "0", localStorage.setItem("matchListCount", JSON.stringify(r)))
+    })) : $.getJSON("//" + t + "/includesU/toplink/topLink_matchsetJson.asp?jsoncallback=?", {
+        format: "json",
+        osetid: c
+    }).done(function(t) {
+        var e = t.contents.length;
+        if (1 == e) "nodata" == t.contents[0].setid && (localStorage.removeItem("matchDateBegin"), localStorage.removeItem("matchListCount"));
+        else {
+            var n = "";
+            for (i = 0; i < e; i++) n = n + '{"setid":"' + t.contents[i].setid + '", "num": ' + t.contents[i].num + ', "setCss":"' + t.contents[i].setCss + '"},';
+            n = "[" + (n = n.substring(0, n.length - 1)) + "]", null != localStorage.getItem("matchListCount") && null != localStorage.getItem("matchDateBegin") ? matchJsonChange(n, a) : localStorage.setItem("matchListCount", n), localStorage.setItem("matchDateBegin", l.getTime());
+            var o = JSON.parse(localStorage.getItem("matchListCount"));
+            $.each(o, function(t, e) {
+                "topNum" == e.setid && "1" == e.setCss && ($("#matchcount").html(" <i class='iconExclamation' aria-hidden='true'>"), $("#matchcount").show(), $(".match").addClass("matchact"))
+            })
+        }
+    }))
+}
+
+function matchStorageInside() {
+    $("#matchcount").hide(), $(".match").removeClass("matchact");
+    var n, s = localStorage.getItem("matchListCount"),
+        c = localStorage.getItem("matchDateBegin"),
+        t = !1,
+        l = new Date,
+        e = "",
+        o = location.hostname;
+    "192.168.1.234" != o && "wwwtest.1111.com.tw" != o && (o = "www.1111.com.tw"), null != s && null != c && l.getTime() - c < 18e5 && (t = !0), 0 <= location.pathname.indexOf("/talents/membercenter/match-joblist.asp") && (e = QueryString("matchguid").replace("{", "").replace("}", "").toUpperCase()), t ? (n = JSON.parse(s), $.each(n, function(t, e) {
+        $(".iptm" + e.setid).html(e.num), "1" == e.setCss && 0 < e.num && $(".ipdd" + e.setid).addClass("unread"), "topNum" == e.setid && "1" == e.setCss && (n[t].setCss = "0", localStorage.setItem("matchListCount", JSON.stringify(n)))
+    }), t = new Date(parseInt(c)), $(".matchBarTime").html("更新時間:" + ("0" + t.getHours()).slice(-2) + ":" + ("0" + t.getMinutes()).slice(-2))) : $.getJSON("//" + o + "/includesU/toplink/topLink_matchsetJson.asp?jsoncallback=?", {
+        format: "json",
+        osetid: e
+    }).done(function(t) {
+        var e = t.contents.length;
+        if (1 == e) localStorage.removeItem("matchDateBegin"), localStorage.removeItem("matchListCount");
+        else {
+            var n = "";
+            for (i = 0; i < e; i++) n = n + '{"setid":"' + t.contents[i].setid + '", "num": ' + t.contents[i].num + ', "setCss":"' + t.contents[i].setCss + '"},';
+            n = "[" + (n = n.substring(0, n.length - 1)) + "]", null != s && null != c ? matchJsonChange(n, s) : localStorage.setItem("matchListCount", n), localStorage.setItem("matchDateBegin", l.getTime());
+            var o = new Date(parseInt(localStorage.getItem("matchDateBegin"))),
+                a = JSON.parse(localStorage.getItem("matchListCount"));
+            $.each(a, function(t, e) {
+                $(".iptm" + e.setid).html(e.num), "1" == e.setCss && 0 < e.num && $(".ipdd" + e.setid).addClass("unread"), "topNum" == e.setid && "1" == e.setCss && (a[t].setCss = "0", localStorage.setItem("matchListCount", JSON.stringify(a)))
+            });
+            o = new Date(parseInt(localStorage.getItem("matchDateBegin")));
+            $(".matchBarTime").html("更新時間:" + ("0" + o.getHours()).slice(-2) + ":" + ("0" + o.getMinutes()).slice(-2))
+        }
+    })
+}
+
+function matchStorageToplink() {
+    localStorage.removeItem("matchDateBegin"), localStorage.removeItem("matchListCount")
+}
+jQuery(function(t) {
+    toplinkmenu()
+});
